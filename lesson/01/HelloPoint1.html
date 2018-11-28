@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Draw a point(1)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="../../lib/cuon-utils.js"></script>
+  <script src="../../lib/webgl-debug.js"></script>
+  <script src="../../lib/webgl-utils.js"></script>
+</head>
+<body onload="main()">
+  <canvas id="webgl" width="400" height="400">
+    please use the browser supporting 'canvas'
+  </canvas>
+</body>
+<script>
+  // 顶点着色器程序
+  var VSHADER_SOURCE = 
+    'void main() {\n' + 
+    ' gl_Position = vec4(0.4, 0.0, 0.0, 1.0);\n' +
+    ' gl_PointSize = 10.0;\n' + 
+    '}\n'
+
+  // 片元着色器程序
+  var FSHADER_SOURCE =
+    'void main() {\n' + 
+    ' gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\n' +
+    '}\n'
+    
+  function main () {
+    var canvas = document.getElementById('webgl')
+
+    var gl = getWebGLContext(canvas)
+    if (!gl) {
+      console.log('获取不到webGL上下文')
+      return
+    }
+
+    if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+      console.log('Failed to get the rendering context for webGL')
+      return
+    }
+
+    gl.clearColor(1.0, 0.0, 0.0, 1.0)
+    gl.clear(gl.COLOR_BUFFER_BIT)
+
+    gl.drawArrays(gl.POINTS, 0, 1)
+  }
+</script>
+</html>
