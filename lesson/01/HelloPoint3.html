@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Draw a point(3)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="../../lib/cuon-utils.js"></script>
+  <script src="../../lib/webgl-debug.js"></script>
+  <script src="../../lib/webgl-utils.js"></script>
+</head>
+<body onload="main()">
+  <canvas id="webgl" width="400" height="400">
+    please use the browser supporting 'canvas'
+  </canvas>
+</body>
+<script>
+  // 顶点着色器程序
+  var VSHADER_SOURCE =
+    'attribute vec4 a_Position;\n' +
+    'attribute float a_PointSize;\n' +
+    'void main() {\n' + 
+    ' gl_Position = a_Position;\n' +
+    ' gl_PointSize = a_PointSize;\n' + 
+    '}\n'
+
+  // 片元着色器程序
+  var FSHADER_SOURCE =
+    'void main() {\n' + 
+    ' gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\n' +
+    '}\n'
+    
+  function main () {
+    var canvas = document.getElementById('webgl')
+
+    var gl = getWebGLContext(canvas)
+    if (!gl) {
+      console.log('获取不到webGL上下文')
+      return
+    }
+
+    if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
+      console.log('Failed to get the rendering context for webGL')
+      return
+    }
+
+    var a_Position = gl.getAttribLocation(gl.program, 'a_Position')
+    if (a_Position < 0) {
+      console.log('Failed to get the storage location of a_Position')
+      return
+    }
+    // gl.vertexAttrib3f(a_Position, 0.0, 0.0, 0.0)
+
+    var a_PointSize = gl.getAttribLocation(gl.program, 'a_PointSize')
+    gl.vertexAttrib1f(a_PointSize, 5.0)
+
+    canvas.onmousemove = function (ev) {
+      click(ev, gl, canvas, a_Position)
+    }
+
+    gl.clearColor(1.0, 0.0, 0.0, 1.0)
+    gl.clear(gl.COLOR_BUFFER_BIT)
+
+    // gl.drawArrays(gl.POINTS, 0, 1)
+  }
+
+  var g_points = []
+  function click (ev, gl, canvas, a_Position) {
+    var rect = ev.target.getBoundingClientRect()
+    var x = ((ev.clientX - rect.left) - canvas.height / 2) / (canvas.height / 2)
+    var y = (canvas.width / 2 - (ev.clientY - rect.top)) / (canvas.width / 2)
+
+    g_points.push([x, y])
+
+    gl.clear(gl.COLOR_BUFFER_BIT)
+
+    var len = g_points.length
+    for (var i = 0; i < len; i += 2) {
+      var xy = g_points[i]
+      gl.vertexAttrib3f(a_Position, xy[0], xy[1], 0.0)
+      gl.drawArrays(gl.POINTS, 0, 1)
+    }
+  }
+</script>
+</html>
